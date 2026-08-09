@@ -32,3 +32,4 @@ profiles/*.local.json
 Thumbs.db
 .vscode/
 .idea/
+dist/
