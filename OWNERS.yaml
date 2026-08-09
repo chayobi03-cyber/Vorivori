@@ -1,0 +1,53 @@
+# 담당자 지정
+#
+# 담당자가 없는 하네스는 6개월이면 썩는다. 이 파일은 인수인계 시 채우는 것이며
+# 값이 비어 있어도 게이트를 막지 않는다 — 다만 매번 경고한다.
+# REQUIRE_OWNERS=1 로 차단으로 승격할 수 있다.
+#
+# Ainative/OWNERS.yaml 과 같은 형식이다. 두 저장소의 담당자를 함께 정하는 것이 낫다.
+#
+# 확인:  ./ci/gate.sh
+
+version: 1
+
+roles:
+  # 하네스 코어·아티팩트·태스크뱅크를 책임진다.
+  # GEPA 승격 판단과 회귀 하한 조정이 이 사람 몫이다.
+  harness_owner:
+    name: ""              # 예: "홍길동" / "플랫폼팀" / "@gildong"
+    contact: ""
+    backup: ""
+
+  # 정책 엔진·프로파일·샌드박스를 책임진다.
+  # 사내 프로파일 불변식이 실제로 걸려 있는지 보증하는 것이 핵심 책무다.
+  policy_owner:
+    name: ""
+    contact: ""
+    backup: ""
+
+  # 위 둘이 같은 사람이어도 된다. 다만 **명시**할 것.
+  # 비워두면 "아무도 안 본다"와 구분되지 않는다.
+
+# 승인이 필요한 변경.
+approvals:
+  # 사내 프로파일의 egress/exec/capture 완화
+  profile_relaxation: "policy_owner"
+  # 샌드박스 정책 변경 (preflight 항목 포함)
+  sandbox_change: "policy_owner"
+  # 게이트 G-05 회귀 하한 하향
+  regression_floor: "harness_owner"
+  # 태스크뱅크 holdout 변경 — 승격 판단의 기준이 바뀐다
+  holdout_change: "harness_owner"
+
+# 재검토 담당.
+review_assignments:
+  # 지연 추정표(docs/AUDIT.md §B)를 실측으로 교체
+  latency_measurement: ""     # Phase 3 착수 시
+  # 녹음 고지 법무 검토 — Phase 3 차단 조건
+  recording_consent_legal: ""
+  # 태스크뱅크 확대 (48건 → 200건)
+  taskbank_expansion: ""
+
+notes: |
+  docs/SECURITY.md §9의 미해결 목록은 policy_owner가 분기마다 확인한다.
+  해결되지 않은 항목을 목록에서 지우지 않는다.

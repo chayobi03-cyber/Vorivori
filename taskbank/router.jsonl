@@ -1,0 +1,48 @@
+{"id":"rt-001","input":"10메가부터 1기가까지 임피던스 매칭 코드 짜줘","expect":"PYTHON_TOOL","note":"EMC 용어가 나오지만 요구는 코드 생성이다. 도메인 명사보다 동사가 의도를 정한다.","split":"train"}
+{"id":"rt-002","input":"이 에스 파라미터 그래프에서 반사 큰 구간 찾아줘","expect":"EMC_ANALYSIS","note":"STT 띄어쓰기 변형","split":"train"}
+{"id":"rt-003","input":"에스파라미터 s11 좀 봐줘","expect":"EMC_ANALYSIS","split":"train"}
+{"id":"rt-004","input":"s 파라미터 측정 결과 해석해줘","expect":"EMC_ANALYSIS","split":"train"}
+{"id":"rt-005","input":"오늘 오후 일정 뭐 있지","expect":"SCHEDULE_QUERY","split":"train"}
+{"id":"rt-006","input":"내일 회의 몇시부터야","expect":"SCHEDULE_QUERY","note":"'일정' 없이 '회의 몇시'로 묻는다","split":"train"}
+{"id":"rt-007","input":"이번주 남은 미팅 정리해줘","expect":"SCHEDULE_QUERY","note":"'정리해줘'가 DOCUMENTATION을 끌어당기는 함정","split":"train"}
+{"id":"rt-008","input":"도커 이미지 다시 빌드해서 올려줘","expect":"INFRA_OPERATION","split":"train"}
+{"id":"rt-009","input":"netlify에 배포해줘","expect":"INFRA_OPERATION","split":"train"}
+{"id":"rt-010","input":"vllm 서빙 설정 좀 고쳐줘","expect":"INFRA_OPERATION","split":"train"}
+{"id":"rt-011","input":"방금 아이디어 하나 떠올랐는데 페라이트 코어 위치 바꾸는 거","expect":"IDEA_CAPTURE","split":"train"}
+{"id":"rt-012","input":"나중에 해볼 거 메모해둬 쉴드캔 접지점 두 개로 늘리기","expect":"IDEA_CAPTURE","split":"train"}
+{"id":"rt-013","input":"이거 나중에 해보면 어떨까 싶은데 적어둬","expect":"IDEA_CAPTURE","note":"'적어둬'가 MEASUREMENT_LOG와 충돌한다","split":"train"}
+{"id":"rt-014","input":"현재 100메가 노이즈 마이너스 42dBm 기록해줘","expect":"MEASUREMENT_LOG","split":"train"}
+{"id":"rt-015","input":"지금 값 적어둬 3.2볼트","expect":"MEASUREMENT_LOG","split":"train"}
+{"id":"rt-016","input":"측정값 로그 남겨 300메가 마이너스 55","expect":"MEASUREMENT_LOG","split":"train"}
+{"id":"rt-017","input":"이 함수 리팩터링 해줘","expect":"PYTHON_TOOL","split":"train"}
+{"id":"rt-018","input":"csv 읽어서 그래프 그리는 스크립트 만들어줘","expect":"PYTHON_TOOL","split":"train"}
+{"id":"rt-019","input":"pytest 통과하게 고쳐줘","expect":"PYTHON_TOOL","split":"train"}
+{"id":"rt-020","input":"50옴 기준으로 반사계수 얼마야","expect":"CALCULATION","note":"임피던스 용어가 있으나 단발 계산이다","split":"train"}
+{"id":"rt-021","input":"dBm을 와트로 환산해줘","expect":"CALCULATION","split":"train"}
+{"id":"rt-022","input":"이거 몇 데시벨이야","expect":"CALCULATION","split":"train"}
+{"id":"rt-023","input":"아까 회의 내용 회의록으로 정리해줘","expect":"DOCUMENTATION","split":"train"}
+{"id":"rt-024","input":"오늘 한 거 보고서로 만들어줘","expect":"DOCUMENTATION","split":"train"}
+{"id":"rt-025","input":"readme 업데이트 해줘","expect":"DOCUMENTATION","split":"train"}
+{"id":"rt-026","input":"안녕 잘 되나","expect":"GENERAL","split":"train"}
+{"id":"rt-027","input":"방금 뭐라고 했지","expect":"GENERAL","split":"train"}
+{"id":"rt-028","input":"터치스톤 파일 로드해서 s21 플롯하는 코드","expect":"PYTHON_TOOL","note":"EMC 명사 2개 + 코드 요구. rt-001과 같은 함정","split":"train"}
+{"id":"rt-029","input":"이 스미스차트 해석 좀","expect":"EMC_ANALYSIS","split":"train"}
+{"id":"rt-030","input":"방사 노이즈 왜 30메가에서 튀는지 봐줘","expect":"EMC_ANALYSIS","split":"train"}
+{"id":"rt-031","input":"임피던스 매칭 이론 설명해줘","expect":"EMC_ANALYSIS","note":"설명 요청. 코드도 계산도 아니다","split":"train"}
+{"id":"rt-032","input":"다음주 화요일 일정 비어있어","expect":"SCHEDULE_QUERY","split":"train"}
+{"id":"rt-033","input":"컨테이너 로그 좀 보여줘","expect":"INFRA_OPERATION","split":"train"}
+{"id":"rt-034","input":"gpu 메모리 얼마나 남았어","expect":"INFRA_OPERATION","split":"train"}
+{"id":"rt-035","input":"생각난 김에 적어두자 필터 커패시터 용량 재검토","expect":"IDEA_CAPTURE","split":"train"}
+{"id":"rt-036","input":"1기가에서 리턴로스 마이너스 12 기록","expect":"MEASUREMENT_LOG","note":"EMC 용어 + 기록 동사. 기록이 이긴다","split":"train"}
+{"id":"rt-037","input":"넘파이로 fft 하는 코드 짜줘","expect":"PYTHON_TOOL","split":"holdout"}
+{"id":"rt-038","input":"오늘 남은 회의 있나","expect":"SCHEDULE_QUERY","split":"holdout"}
+{"id":"rt-039","input":"s4p 파일에서 크로스토크 확인해줘","expect":"EMC_ANALYSIS","split":"holdout"}
+{"id":"rt-040","input":"이 값 기록해두고 어제 값이랑 비교해줘","expect":"MEASUREMENT_LOG","note":"기록+비교 복합. 기록이 선행 동작이다","split":"holdout"}
+{"id":"rt-041","input":"도커 컴포즈 파일 수정해줘","expect":"INFRA_OPERATION","split":"holdout"}
+{"id":"rt-042","input":"떠오른 건데 그라운드 플레인 분리해보면 어떨까","expect":"IDEA_CAPTURE","split":"holdout"}
+{"id":"rt-043","input":"vswr 2면 반사손실 몇이야","expect":"CALCULATION","split":"holdout"}
+{"id":"rt-044","input":"이번 시험 결과 문서로 남겨줘","expect":"DOCUMENTATION","split":"holdout"}
+{"id":"rt-045","input":"스크립트로 s2p 여러개 일괄 처리하게 만들어줘","expect":"PYTHON_TOOL","split":"holdout"}
+{"id":"rt-046","input":"차폐 효과 측정 데이터 좀 분석해줘","expect":"EMC_ANALYSIS","split":"holdout"}
+{"id":"rt-047","input":"고마워","expect":"GENERAL","split":"holdout"}
+{"id":"rt-048","input":"내일 오전에 시간 잡아둬","expect":"SCHEDULE_QUERY","note":"일정 생성 요청 — 조회와 같은 카테고리로 보내고 승인은 정책 엔진이 건다","split":"holdout"}

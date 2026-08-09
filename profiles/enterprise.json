@@ -1,0 +1,106 @@
+{
+  "$comment": "사내 에디션. 망분리 전제. Profile.validate()가 egress_default=deny, 캡처 스크리닝, 클라우드 프로바이더 금지를 강제한다 — 이 파일을 느슨하게 고치면 로드가 실패한다.",
+
+  "name": "enterprise-emc",
+  "edition": "enterprise",
+  "vault_root": "vault/work",
+
+  "egress_default": "deny",
+  "egress_allow": [
+    "gpu-node-*.internal",
+    "qdrant.internal",
+    "livekit.internal",
+    "artifact-proxy.internal"
+  ],
+  "egress_deny": [
+    "*.anthropic.com",
+    "*.openai.com",
+    "*.googleapis.com",
+    "generativelanguage.googleapis.com",
+    "*.netlify.app",
+    "api.netlify.com"
+  ],
+
+  "providers": {
+    "qwen_coder_local": {
+      "transport": "local",
+      "endpoint": "http://gpu-node-1.internal:8000/v1",
+      "model": "Qwen2.5-Coder-32B-Instruct-AWQ",
+      "strength": "코드 생성, tool-calling",
+      "role": "implement"
+    },
+    "qwen_vl_local": {
+      "transport": "local",
+      "endpoint": "http://gpu-node-1.internal:8001/v1",
+      "model": "Qwen2-VL-7B-Instruct",
+      "strength": "화면·차트 판독",
+      "role": "vision",
+      "note": "72B가 아니라 7B다. 근거는 docs/AUDIT.md §C."
+    },
+    "local_reflect": {
+      "transport": "local",
+      "endpoint": "http://gpu-node-1.internal:8000/v1",
+      "model": "Qwen2.5-Coder-32B-Instruct-AWQ",
+      "strength": "GEPA 반사 제안",
+      "role": "propose"
+    }
+  },
+
+  "exec_default": "confirm",
+  "exec_allow": [
+    "^git (status|log|diff|show|branch)\\b",
+    "^python3? -m pytest\\b",
+    "^Get-(ChildItem|Content|Location|Process|Date)\\b",
+    "^Test-Path\\b",
+    "^Measure-Object\\b"
+  ],
+  "exec_deny": [
+    "Invoke-Expression",
+    "\\biex\\b",
+    "Invoke-WebRequest",
+    "\\bcurl\\b",
+    "\\bwget\\b",
+    "Start-Process",
+    "Set-ExecutionPolicy",
+    "New-Object\\s+Net\\.WebClient",
+    "-EncodedCommand",
+    "Remove-Item.*-Recurse.*-Force",
+    "\\brm\\s+-rf\\b",
+    "Get-Credential",
+    "ConvertFrom-SecureString",
+    "reg\\s+add",
+    "schtasks"
+  ],
+
+  "capture_require_screening": true,
+  "capture_allow_apps": [
+    "Code.exe",
+    "WindowsTerminal.exe",
+    "python*.exe",
+    "jupyter*",
+    "*.pdf"
+  ],
+  "capture_deny_apps": [
+    "*outlook*",
+    "*teams*",
+    "*KakaoTalk*",
+    "*mstsc*",
+    "*KeePass*",
+    "*1Password*",
+    "*Bitwarden*"
+  ],
+
+  "store_redact_secrets": true,
+  "store_retention_days": 180,
+
+  "approvals": {
+    "calendar.create": "user",
+    "calendar.delete": "admin",
+    "exec.host": "user",
+    "egress.external": "security",
+    "vault.export": "security",
+    "measurement.commit": "user"
+  },
+
+  "pinned_to": ["*.corp.local", "EMC-WS-*"]
+}

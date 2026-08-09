@@ -1,0 +1,96 @@
+{
+  "$comment": "사외/개인 에디션. 클라우드 프로바이더를 쓰되, 사내 볼트와는 물리적으로 다른 vault_root를 가리킨다. pinned_to로 사내 PC에서 이 프로파일이 뜨는 것을 막는다 — 그것이 가장 현실적인 유출 경로다.",
+
+  "name": "personal-daily",
+  "edition": "personal",
+  "vault_root": "vault/personal",
+
+  "egress_default": "confirm",
+  "egress_allow": [
+    "api.anthropic.com",
+    "api.openai.com",
+    "generativelanguage.googleapis.com",
+    "localhost",
+    "127.0.0.1"
+  ],
+  "egress_deny": [
+    "*.corp.local",
+    "*.internal"
+  ],
+
+  "providers": {
+    "claude": {
+      "transport": "cloud",
+      "endpoint": "api.anthropic.com",
+      "model": "claude-opus-5",
+      "strength": "리팩터링, 문서화, 긴 문맥 추론",
+      "role": "review"
+    },
+    "gpt": {
+      "transport": "cloud",
+      "endpoint": "api.openai.com",
+      "strength": "아키텍처 초안, 대안 탐색",
+      "role": "architect"
+    },
+    "gemini_cli": {
+      "transport": "cloud",
+      "endpoint": "generativelanguage.googleapis.com",
+      "strength": "로컬 파일 조작, CLI 자동화",
+      "role": "operate"
+    },
+    "qwen_local": {
+      "transport": "local",
+      "endpoint": "http://127.0.0.1:8000/v1",
+      "model": "Qwen2.5-Coder-7B-Instruct",
+      "strength": "오프라인 코딩, 저비용 반복",
+      "role": "implement"
+    }
+  },
+
+  "exec_default": "confirm",
+  "exec_allow": [
+    "^git (status|log|diff|show|branch|add|commit)\\b",
+    "^python3? -m pytest\\b",
+    "^python3? tools/",
+    "^npm (run|test|ci)\\b",
+    "^Get-(ChildItem|Content|Location|Process|Date)\\b"
+  ],
+  "exec_deny": [
+    "Invoke-Expression",
+    "\\biex\\b",
+    "-EncodedCommand",
+    "Set-ExecutionPolicy",
+    "\\brm\\s+-rf\\s+/",
+    "Get-Credential",
+    "ConvertFrom-SecureString",
+    "\\bsudo\\b"
+  ],
+
+  "capture_require_screening": true,
+  "capture_allow_apps": [],
+  "capture_deny_apps": [
+    "*KeePass*",
+    "*1Password*",
+    "*Bitwarden*",
+    "*banking*",
+    "*.corp.local*",
+    "*KakaoTalk*",
+    "*Slack*",
+    "*Discord*",
+    "*outlook*",
+    "*Thunderbird*"
+  ],
+
+  "store_redact_secrets": true,
+  "store_retention_days": 0,
+
+  "approvals": {
+    "calendar.create": "user",
+    "calendar.delete": "user",
+    "exec.host": "user",
+    "egress.external": "user",
+    "vault.export": "user"
+  },
+
+  "pinned_to": []
+}
