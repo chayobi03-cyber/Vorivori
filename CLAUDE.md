@@ -43,6 +43,7 @@ GPU·LLM·네트워크 없이 전부 돈다. 도커는 격리 실행에만 쓰�
 | 샌드박스 정책 확인 | `python3 harness/sandbox/policy.py` |
 | 프로바이더 라우팅 확인 | `python3 harness/providers/registry.py` |
 | 샌드박스 실행 루프 | `python3 tools/vv.py run <지시> --code "print(1)"` |
+| 인수인계 패키지 | `./tools/make_handover.sh` |
 
 ## 규칙
 

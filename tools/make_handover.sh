@@ -54,16 +54,27 @@ import pathlib, sys
 sys.path.insert(0, str(pathlib.Path.cwd()))
 from harness.policy.engine import scan_secrets
 root = pathlib.Path(sys.argv[1])
-bad = []
+bad, skipped = [], []
 for p in root.rglob("*"):
-    if p.is_file() and p.suffix in (".md", ".json", ".py", ".sh", ".jsonl", ".yaml"):
-        found = scan_secrets(p.read_text(encoding="utf-8", errors="ignore"))
-        if found:
-            bad.append((str(p.relative_to(root)), found))
+    if not (p.is_file() and p.suffix in (".md", ".json", ".py", ".sh", ".jsonl", ".yaml")):
+        continue
+    text = p.read_text(encoding="utf-8", errors="ignore")
+    rel = str(p.relative_to(root))
+    # 스캐너 자신을 시험하는 파일은 가짜 크리덴셜을 의도적으로 담는다.
+    # 표식이 있으면 건너뛰되 **건너뛴 사실을 출력한다** — 조용히 넘어가면
+    # 예외가 예외인 줄 모르게 되고, 진짜 비밀이 그 뒤에 숨는다.
+    if "vorivori:scan-allow" in text:
+        skipped.append(rel)
+        continue
+    found = scan_secrets(text)
+    if found:
+        bad.append((rel, found))
 if bad:
     print("  중단: 크리덴셜 패턴 탐지", bad, file=sys.stderr)
     sys.exit(1)
-print("  크리덴셜 패턴 없음")
+for s in skipped:
+    print(f"  건너뜀(scan-allow 표식): {s}")
+print(f"  크리덴셜 패턴 없음 (검사 대상에서 {len(skipped)}개 명시적 제외)")
 PY
 
 echo

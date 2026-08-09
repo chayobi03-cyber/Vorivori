@@ -51,6 +51,9 @@ python3 tools/gepa_run.py --dump-prompt
 
 # 단위시험
 python3 -m unittest discover -s tests -v
+
+# 사내 전달용 패키지 (게이트 실패 시 만들지 않음)
+./tools/make_handover.sh
 ```
 
 ## 설계 원칙
@@ -116,6 +119,7 @@ Ainative에서 가져온 규율이다. 태스크뱅크 점수와 실사용 정�
 
 | 문서 | 용도 |
 |---|---|
+| [`docs/HANDOVER.md`](docs/HANDOVER.md) | **인수인계 체크리스트** — 빠뜨리기 쉬운 것, 미검증 목록 |
 | [`docs/DAILY_USE.md`](docs/DAILY_USE.md) | **매일 쓰기** — `vv` 명령, 일정, 리뷰 습관 |
 | [`docs/AUDIT.md`](docs/AUDIT.md) | **원본 PRD v2.0 상세 점검** — 14개 항목, 심각도별 |
 | [`docs/GEPA_HARNESS.md`](docs/GEPA_HARNESS.md) | GEPA 하네스 엔지니어링 설계와 실측 |

@@ -2,6 +2,11 @@
 """하네스 코어 자기시험. 외부 의존성·네트워크 없이 돈다 (unittest, 표준 라이브러리).
 
     python3 -m unittest discover -s tests -v
+
+vorivori:scan-allow — 이 파일은 비밀 스캐너를 시험하기 위해 **가짜** 크리덴셜
+패턴을 의도적으로 담고 있다(`sk-ant-aaa…`, `AKIA…`, 주민번호 형식 등).
+전부 시험용 리터럴이며 실제 값이 아니다. 반출 스캔이 이 표식을 보고 건너뛰되,
+건너뛴 사실을 출력한다 — 조용히 넘어가면 예외가 예외인 줄 모르게 된다.
 """
 from __future__ import annotations
 
