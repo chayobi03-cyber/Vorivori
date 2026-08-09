@@ -11,8 +11,8 @@ GEPA 반사 개선 루프로 결과 품질을 올리는 업무 실행 하네스.
 | 항목 | 값 |
 |---|---|
 | 단계 | Phase 0 — 하네스 코어 |
-| 게이트 | G-01~G-08 **8/8 통과** |
-| 단위시험 | 51건 통과 |
+| 게이트 | G-01~G-09 **9/9 통과** |
+| 단위시험 | 80건 통과 |
 | 라우터 태스크뱅크 | 48건 (train 36 / holdout 12) |
 | 라우터 정확도 | train 0.778 → **0.972**, holdout 0.667 → **0.750~0.833** (GEPA 5시드) |
 | 의존성 | Python 3.11 표준 라이브러리만. 설치할 것 없음 |
@@ -24,6 +24,13 @@ GEPA 반사 개선 루프로 결과 품질을 올리는 업무 실행 하네스.
 ## 빠른 시작
 
 ```bash
+# 매일 쓰는 진입점 (개인판)
+alias vv='python3 ~/Vorivori/tools/vv.py'
+vv i 쉴드캔 접지점 두 개로 늘려보기   # 아이디어 포착 — 따옴표도 플래그도 없다
+vv today                              # 오늘 일정과 빈 구간
+vv a 도커 이미지 빌드해줘              # 분류 + 어느 AI로 갈지
+vv review                             # 주간 리뷰 + 방치 감지
+
 # 품질 게이트 (외부 의존성 없음, 폐쇄망 가능)
 ./ci/gate.sh
 
@@ -94,17 +101,20 @@ Ainative에서 가져온 규율이다. 태스크뱅크 점수와 실사용 정�
 | `harness/router/` | 아티팩트 해석 분류기. 한국어 STT 표기 흔들림 흡수 |
 | `harness/optimize/` | GEPA 루프 — 파레토 프런티어, 반사 변이, 프로포저 3종 |
 | `harness/sandbox/` | 도커 실행 정책 생성기 + preflight |
+| `harness/schedule/` | 로컬 `.ics` 읽기 — 일정, 빈 구간 |
+| `harness/providers/` | 프로바이더 라우팅 (역할 기반 + 승급 사다리) |
 | `artifacts/` | **최적화 대상 텍스트 아티팩트** |
 | `taskbank/` | GEPA 평가 인스턴스 (train / holdout) |
 | `profiles/` | 사내·개인 프로파일 (정본) |
 | `vault/` | work / personal 볼트 — 절대 교차하지 않음 |
-| `tools/` | 게이트·시연·GEPA 실행기 |
+| `tools/` | `vv` CLI · 시연 · GEPA 실행기 |
 | `ci/gate.sh` | CI 진입점 — 어떤 CI에서든 이것만 호출 |
 
 ## 문서
 
 | 문서 | 용도 |
 |---|---|
+| [`docs/DAILY_USE.md`](docs/DAILY_USE.md) | **매일 쓰기** — `vv` 명령, 일정, 리뷰 습관 |
 | [`docs/AUDIT.md`](docs/AUDIT.md) | **원본 PRD v2.0 상세 점검** — 14개 항목, 심각도별 |
 | [`docs/GEPA_HARNESS.md`](docs/GEPA_HARNESS.md) | GEPA 하네스 엔지니어링 설계와 실측 |
 | [`docs/EDITIONS.md`](docs/EDITIONS.md) | 사내판 / 사외판 분리 |
@@ -142,7 +152,7 @@ FAIL/WARN 구분)을 공유하므로 한 CI 파이프라인에서 함께 돈다.
 
 ## 다음 단계
 
-1. `OWNERS.yaml` 담당자 기입 → CI에 `REQUIRE_OWNERS=1`
-2. 개인판을 매일 사용해 실사용 발화 수집 → 태스크뱅크 200건
+1. 개인판을 매일 사용해 실사용 발화 수집 → 태스크뱅크 200건 (`docs/DAILY_USE.md`)
+2. `OWNERS.yaml` 담당자 기입 → CI에 `REQUIRE_OWNERS=1`
 3. Phase 1 착수: 도커 샌드박스 실제 실행 + LangGraph 상태 머신 + INTERRUPT 노드
 4. Phase 3 착수 전 **녹음 고지 법무 검토** (차단 조건)

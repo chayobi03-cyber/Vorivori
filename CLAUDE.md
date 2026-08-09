@@ -28,6 +28,7 @@ Claude Code(및 다른 AI 어시스턴트)가 이 저장소에서 작업할 때�
 
 | 목적 | 명령 |
 |---|---|
+| 일상 사용 (개인판) | `python3 tools/vv.py --help` |
 | CI 게이트 (진입점) | `./ci/gate.sh` |
 | 품질 게이트 | `./tests/run_checks.sh` |
 | 단위시험 | `python3 -m unittest discover -s tests -v` |
@@ -39,6 +40,7 @@ Claude Code(및 다른 AI 어시스턴트)가 이 저장소에서 작업할 때�
 | 반사 프롬프트 추출 | `python3 tools/gepa_run.py --dump-prompt` |
 | 정책 엔진 점검 | `python3 harness/policy/engine.py profiles/enterprise.json` |
 | 샌드박스 정책 확인 | `python3 harness/sandbox/policy.py` |
+| 프로바이더 라우팅 확인 | `python3 harness/providers/registry.py` |
 
 ## 규칙
 
@@ -132,6 +134,7 @@ Phase 3의 차단 조건이다.
 | G-06 | 샌드박스 정책 preflight | FAIL |
 | G-07 | 볼트 경로 분리 | FAIL |
 | G-08 | 볼트 비밀 스캔 | FAIL |
+| G-09 | 프로바이더 라우팅 (사내는 로컬만) | FAIL |
 | — | `OWNERS.yaml` 담당자 기입 | WARN (`REQUIRE_OWNERS=1`로 승격) |
 
 ## Git and branching

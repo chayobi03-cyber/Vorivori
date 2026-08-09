@@ -125,6 +125,25 @@ for p in pathlib.Path("vault").rglob("*.md"):
 assert not bad, bad
 PY
 
+# G-09 프로바이더 라우팅 아티팩트.
+#      사내 프로파일이 어떤 카테고리에서도 클라우드를 고르면 안 된다.
+#      라우팅 규칙이 아티팩트라 손으로 고칠 수 있으므로 매번 확인한다.
+run "G-09 프로바이더 라우팅" python3 - <<'PY'
+import json, pathlib, sys
+sys.path.insert(0, str(pathlib.Path.cwd()))
+from harness.policy.engine import PolicyEngine, Profile
+from harness.providers.registry import ProviderRouter
+cats = json.loads(pathlib.Path("artifacts/router.rules.json").read_text())["categories"]
+ent = PolicyEngine(Profile.load("profiles/enterprise.json"))
+r = ProviderRouter.load(ent)
+for c in cats:
+    ch = r.select(c)
+    assert ch.ok, f"{c}: 사내 프로파일에서 선택 가능한 프로바이더가 없다"
+    assert ch.transport == "local", f"{c} → {ch.provider} ({ch.transport}) — 사내에서 클라우드 금지"
+# 개인 프로파일도 로드는 돼야 한다
+ProviderRouter.load(PolicyEngine(Profile.load("profiles/personal.json")))
+PY
+
 echo
 if [ "$fail" -eq 0 ]; then
   echo "게이트 통과."
