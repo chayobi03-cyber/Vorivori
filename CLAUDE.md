@@ -12,7 +12,8 @@ Claude Code(및 다른 AI 어시스턴트)가 이 저장소에서 작업할 때�
 **지식**을 다루고, 이 저장소가 **실행**을 다룬다. 두 저장소는 같은 엔지니어링
 규약을 공유한다 — 그 규약을 깨지 말 것.
 
-현재 Phase 0(하네스 코어). GPU·도커·LLM·네트워크 없이 전부 돈다.
+Phase 0(하네스 코어) 완료, Phase 1(실행 루프) 진행 중.
+GPU·LLM·네트워크 없이 전부 돈다. 도커는 격리 실행에만 쓰인다.
 
 ## 기술 스택
 
@@ -41,6 +42,7 @@ Claude Code(및 다른 AI 어시스턴트)가 이 저장소에서 작업할 때�
 | 정책 엔진 점검 | `python3 harness/policy/engine.py profiles/enterprise.json` |
 | 샌드박스 정책 확인 | `python3 harness/sandbox/policy.py` |
 | 프로바이더 라우팅 확인 | `python3 harness/providers/registry.py` |
+| 샌드박스 실행 루프 | `python3 tools/vv.py run <지시> --code "print(1)"` |
 
 ## 규칙
 
@@ -67,6 +69,15 @@ python3 tools/gepa_run.py --eval
 
 시험 문제를 채점자가 고치는 셈이다. 태스크뱅크는 **사람이** 추가한다.
 holdout은 특히 손대지 않는다.
+
+### 격리 경계가 아닌 것을 격리라고 부르지 않는다
+
+`SubprocessBackend.is_isolation_boundary`는 `False`다. 네트워크도 파일시스템도
+막지 못하기 때문이다. 이 플래그를 `True`로 바꾸고 싶어지면 멈출 것 —
+사내 에디션이 이 플래그 하나로 비격리 실행을 허용하게 된다.
+
+도커를 쓸 수 없으면 사내 에디션은 **실행을 포기한다.** 격리 없이 사내 데이터로
+AI 생성 코드를 돌리는 것보다 안 돌리는 게 낫다.
 
 ### 정책 엔진을 우회하지 않는다
 
@@ -135,6 +146,7 @@ Phase 3의 차단 조건이다.
 | G-07 | 볼트 경로 분리 | FAIL |
 | G-08 | 볼트 비밀 스캔 | FAIL |
 | G-09 | 프로바이더 라우팅 (사내는 로컬만) | FAIL |
+| G-10 | 실행 루프 안전 (격리 경계·재시도 정책) | FAIL |
 | — | `OWNERS.yaml` 담당자 기입 | WARN (`REQUIRE_OWNERS=1`로 승격) |
 
 ## Git and branching

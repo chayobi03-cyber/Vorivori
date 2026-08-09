@@ -1,0 +1,40 @@
+# 샌드박스 실행 이미지.
+#
+# 왜 패키지를 미리 굽는가
+#   샌드박스는 `--network none` 으로 돈다. 즉 실행 시점에 pip 이 동작하지 않는다.
+#   원본 명세 §9.1이 network:none 을 정하면서 이 결과를 다루지 않아, 그대로
+#   착수하면 첫 실행에서 막힌다. 필요한 것은 전부 여기서 넣는다.
+#
+# 빌드 (인터넷 되는 곳에서 한 번):
+#   docker build -f infra/docker/Dockerfile.py-emc -t vorivori/py-emc:0.1 .
+#
+# 사내 반입 (폐쇄망):
+#   docker save vorivori/py-emc:0.1 | gzip > py-emc-0.1.tar.gz
+#   (매체 반입 절차 후) docker load < py-emc-0.1.tar.gz
+
+FROM python:3.11-slim
+
+# 빌드 도구는 설치 후 지운다. 샌드박스 안에 컴파일러를 남길 이유가 없다.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends build-essential \
+ && pip install --no-cache-dir \
+      numpy scipy pandas matplotlib scikit-rf pytest flake8 \
+ && apt-get purge -y build-essential \
+ && apt-get autoremove -y \
+ && rm -rf /var/lib/apt/lists/* /root/.cache
+
+# matplotlib 은 기본 백엔드가 디스플레이를 찾는다. 헤드리스로 고정한다.
+ENV MPLBACKEND=Agg \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_INDEX=1
+
+# 폰트 캐시를 빌드 시점에 만든다. 읽기 전용 루트에서는 만들 수 없다.
+RUN MPLCONFIGDIR=/tmp python3 -c "import matplotlib.pyplot" || true
+
+# 컨테이너는 --user 65534:65534 로 실행된다(harness/sandbox/policy.py).
+# 이미지에 root 전용 쓰기 경로를 남기지 않는다.
+WORKDIR /work
+USER 65534:65534
+
+CMD ["python3"]

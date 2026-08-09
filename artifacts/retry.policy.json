@@ -1,0 +1,22 @@
+{
+  "artifact_id": "retry.policy",
+  "version": "v0",
+  "generation": 0,
+  "lineage": [],
+  "proposer": "human-seed",
+  "note": "GEPA 최적화 대상. 원본 §19가 'Retry Strategy'를 최적화 대상으로 들었으나 파이썬 for문 안에 있으면 손댈 수 없다. 채점 지표는 '성공까지 평균 시도 수'이며, 그 지표는 Phase 1 실사용 데이터가 쌓여야 의미가 있다 — 지금 값은 사람이 정한 초기값이다.",
+
+  "max_attempts": 3,
+
+  "$escalate_provider": "재시도 시 PLAN으로 돌아가 프로바이더를 승급시킨다. 같은 모델에 같은 에러를 다시 주면 같은 실패가 반복된다.",
+  "escalate_provider": true,
+
+  "$fatal": "재시도해도 풀리지 않는 실패. 정규식 → 사람이 읽을 이유. 3회 태우는 것이 낭비인 경우들이다.",
+  "fatal": {
+    "ModuleNotFoundError|No module named": "샌드박스는 network=none 이라 패키지를 설치할 수 없다. 이미지(infra/docker/Dockerfile.py-emc)에 미리 구워야 한다.",
+    "FileNotFoundError.*\\.s\\dp": "측정 데이터 파일이 컨테이너에 마운트되지 않았다. 코드가 아니라 마운트 설정 문제다.",
+    "PermissionError|Read-only file system": "읽기 전용 루트에 쓰려 했다. /tmp 또는 /work 를 쓰도록 지시가 필요하다.",
+    "MemoryError|Cannot allocate memory": "메모리 한도 초과. 코드 수정보다 데이터 크기나 한도 조정이 먼저다.",
+    "SyntaxError: invalid non-printable character": "생성 코드에 제어문자가 섞였다. 모델 출력 파싱 문제이지 로직 문제가 아니다."
+  }
+}

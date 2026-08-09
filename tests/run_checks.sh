@@ -144,6 +144,35 @@ for c in cats:
 ProviderRouter.load(PolicyEngine(Profile.load("profiles/personal.json")))
 PY
 
+# G-10 실행 루프 안전 규칙.
+#      샌드박스 백엔드 선택과 재시도 정책이 느슨해지면 격리 없이 사내 데이터로
+#      AI 생성 코드가 돈다. 그 회귀를 여기서 막는다.
+run "G-10 실행 루프 안전" python3 - <<'PY2'
+import sys, pathlib
+sys.path.insert(0, str(pathlib.Path.cwd()))
+from harness.execute.loop import RetryPolicy
+from harness.execute.sandbox import DockerBackend, SubprocessBackend, select_backend
+from harness.policy.engine import Profile
+
+assert DockerBackend().is_isolation_boundary
+assert not SubprocessBackend().is_isolation_boundary, \
+    "subprocess 를 격리 경계로 표시하면 SECURITY.md 가 무의미해진다"
+
+ent = Profile.load("profiles/enterprise.json")
+try:
+    select_backend(ent, prefer="subprocess")
+    raise AssertionError("사내 에디션이 비격리 백엔드를 받아들였다")
+except PermissionError:
+    pass
+
+rp = RetryPolicy.load()
+assert 1 <= rp.max_attempts <= 5, f"재시도 {rp.max_attempts}회는 과하다"
+assert rp.is_fatal("ModuleNotFoundError: No module named 'skrf'"), \
+    "설치 불가 오류를 재시도하면 3회를 낭비한다"
+assert rp.is_fatal("OSError: [Errno 30] Read-only file system")
+assert not rp.is_fatal("ValueError: 잘못된 주파수"), "일반 오류까지 fatal 이면 자가수정이 죽는다"
+PY2
+
 echo
 if [ "$fail" -eq 0 ]; then
   echo "게이트 통과."

@@ -56,20 +56,23 @@ python3 tools/gepa_run.py --budget 60   # holdout 0.667 → 0.750~0.833
 
 ---
 
-## Phase 1 — 실행 루프 (4~6주)
+## Phase 1 — 실행 루프 (진행 중)
 
 Phase 0의 "실행계획"을 실제 실행으로 바꾼다.
+상세는 [`EXECUTION.md`](EXECUTION.md).
 
-| 항목 | 완료 기준 |
+| 항목 | 상태 |
 |---|---|
-| 도커 샌드박스 실제 실행 | `network:none` 컨테이너에서 코드 실행·결과 회수 |
-| `py-emc` 이미지 빌드 | numpy/pandas/scikit-rf/pytest 사전 설치 |
-| LangGraph 상태 머신 | INTAKE→CLASSIFY→PLAN→EXECUTE→VERIFY→COMMIT |
-| 자가 수정 루프 | 실패 시 stderr 읽고 재시도 (최대 3회) |
-| **INTERRUPT 노드** | barge-in이 일급 전이. 부작용 노드는 중단 불가 구간 |
-| 로컬 LLM 연결 | Ollama 또는 소형 vLLM. 어떤 모델이든 무방 |
-| 태스크 상태 관리 | `task.created` / `task.updated` 활용 |
-| 일정 **생성**·삭제 | 승인 UI 선행. 삭제는 되돌릴 수 없다 |
+| 상태 머신 (INTAKE→…→COMMIT) | **완료** — LangGraph 대신 자체 구현 |
+| **INTERRUPT 노드** | **완료** — 일급 전이, 중단 불가 구간, 체크포인트 |
+| 자가 수정 루프 | **완료** — 승급·fatal 구분·동일안 감지 |
+| `SubprocessBackend` | **완료** (격리 경계 아님. 개인판 전용) |
+| 재시도 정책 아티팩트 | **완료** — GEPA 최적화 대상 |
+| `DockerBackend` | 구현됨, **실행 미검증** (데몬 있는 환경에서 확인 필요) |
+| `py-emc` 이미지 빌드 | Dockerfile 작성. **빌드 미검증** |
+| 코드 **생성** (모델 연결) | 미착수 — Ollama 또는 소형 vLLM |
+| 태스크 상태 관리 | 스키마·이벤트만. UI 미착수 |
+| 일정 **생성**·삭제 | 미착수. 승인 UI 선행 |
 
 **Phase 1 완료 기준 (측정)**
 

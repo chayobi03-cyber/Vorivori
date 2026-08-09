@@ -31,6 +31,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from harness.execute.loop import CliFixer, NullFixer, RetryPolicy, build_machine  # noqa: E402
+from harness.execute.machine import Ctx as RunCtx, State  # noqa: E402
+from harness.execute.sandbox import select_backend  # noqa: E402
 from harness.memory.events import EventStore, build_context  # noqa: E402
 from harness.memory.vault import STATES, Vault, today  # noqa: E402
 from harness.policy.engine import PolicyEngine, PolicyError, Profile  # noqa: E402
@@ -236,6 +239,61 @@ def cmd_ask(ctx: Ctx, args) -> int:
     return 0
 
 
+def cmd_run(ctx: Ctx, args) -> int:
+    """분류 → 계획 → 샌드박스 실행 → 검증 → 자가 수정 루프를 돈다.
+
+    `--code` 로 실행할 코드를 직접 준다. 코드 **생성**은 아직 붙지 않았다 —
+    모델 연결이 남아 있고, 그 전까지 이 명령은 루프 자체를 검증하는 자리다.
+    """
+    text = " ".join(args.text).strip()
+    if not text:
+        return 2
+    try:
+        backend = select_backend(ctx.profile, prefer=args.backend)
+    except PermissionError as e:
+        print(f"✗ {e}", file=sys.stderr)
+        return 4
+    if not backend.is_isolation_boundary:
+        print(f"⚠ 백엔드 '{backend.name}'는 격리 경계가 아닙니다 "
+              f"(네트워크·파일시스템을 막지 못합니다). 사내 데이터로 쓰지 마세요.\n")
+
+    code = args.code
+    if code is None and args.file:
+        code = Path(args.file).read_text(encoding="utf-8")
+    if code is None:
+        print("✗ 실행할 코드가 없습니다. --code 또는 --file 을 주세요.\n"
+              "  (코드 생성은 Phase 1 잔여 항목입니다 — 모델 연결이 남았습니다.)",
+              file=sys.stderr)
+        return 2
+
+    fixers = [CliFixer(n, c.split()) for n, c in (s.split("=", 1) for s in args.fixer)] \
+        if args.fixer else []
+    fixer = fixers[0] if fixers else NullFixer()
+
+    machine = build_machine(
+        backend=backend, fixer=fixer, router=ctx.router, providers=ctx.providers,
+        retry=RetryPolicy.load(), codegen=lambda c: code, store=ctx.store)
+    out = machine.run(RunCtx(text, project=args.project))
+
+    _hr("실행 추적")
+    for t in out.ctx.trace:
+        print(f"  {t['state']:9} {t['msg']}")
+
+    print()
+    icon = {State.DONE: "✓", State.FAILED: "✗",
+            State.NEEDS_INPUT: "?", State.PARKED: "⏸"}.get(out.final, "·")
+    print(f"{icon} {out.final.value}   시도 {out.ctx.attempt + 1}회   스텝 {out.steps}")
+    if out.final is State.NEEDS_INPUT:
+        print("  분류에 확신이 없습니다. 더 구체적으로 말해주세요.")
+    if out.ctx.last_error:
+        print(f"  마지막 오류: {out.ctx.last_error.splitlines()[-1][:120]}")
+    if out.ctx.result is not None and getattr(out.ctx.result, "stdout", ""):
+        print()
+        _hr("출력")
+        print(out.ctx.result.stdout.rstrip())
+    return 0 if out.ok else 1
+
+
 def cmd_log(ctx: Ctx, args) -> int:
     """측정값 기록. origin은 human이다 — 사람이 직접 친 것이므로."""
     text = " ".join(args.text).strip()
@@ -336,6 +394,15 @@ def main(argv: list[str] | None = None) -> int:
 
     p = add("ask", cmd_ask, "분류하고 어느 AI로 갈지 확인", "a")
     p.add_argument("text", nargs="+")
+
+    p = add("run", cmd_run, "샌드박스 실행 루프", "r")
+    p.add_argument("text", nargs="+")
+    p.add_argument("--code", help="실행할 파이썬 코드")
+    p.add_argument("--file", "-f", help="실행할 파이썬 파일")
+    p.add_argument("--backend", choices=["docker", "subprocess"])
+    p.add_argument("--fixer", action="append", default=[],
+                   help="자가 수정용 CLI. 형식: 이름=명령")
+    p.add_argument("--project", "-p")
 
     p = add("log", cmd_log, "측정값 기록")
     p.add_argument("text", nargs="+")
